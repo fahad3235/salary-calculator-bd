@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salary Calculator BD -- Gross to Net Payslip</title>
+<meta name="description" content="Offline bilingual EN/Bangla salary calculator for Bangladesh: split gross into components, deduct PF + tax, see net take-home pay, save monthly payslips.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar no-print">
+  <div class="brand">
+    <h1 data-i18n="appTitle">Salary Calculator BD</h1>
+    <p data-i18n="appSub">Turn gross salary into take-home pay -- with a payslip you can save.</p>
+  </div>
+  <button id="lang-btn" class="btn outline" data-i18n="langBtn">Bangla</button>
+</header>
+
+<nav class="tabs no-print" role="tablist">
+  <button class="tab-btn active" data-tab="panel-calc" data-i18n="tabCalc">Calculator</button>
+  <button class="tab-btn" data-tab="panel-slips" data-i18n="tabSlips">Payslips</button>
+  <button class="tab-btn" data-tab="panel-data" data-i18n="tabData">Data</button>
+</nav>
+
+<main>
+  <section id="panel-calc" class="tab-panel">
+    <div class="grid">
+      <div class="card no-print">
+        <label for="gross" data-i18n="grossLabel">Gross salary (BDT)</label>
+        <input id="gross" type="number" min="1" max="100000000" step="0.01" inputmode="decimal">
+        <label for="period" data-i18n="periodLabel">Gross period</label>
+        <select id="period">
+          <option value="monthly" data-i18n="monthly">Monthly</option>
+          <option value="yearly" data-i18n="yearly">Yearly</option>
+        </select>
+
+        <h2 data-i18n="splitLabel">Salary split (%) -- must add up to 100%</h2>
+        <div class="split-grid">
+          <label for="split-basic" data-i18n="basic">Basic</label><input id="split-basic" type="number" min="0" max="100" step="0.01" inputmode="decimal">
+          <label for="split-houseRent" data-i18n="houseRent">House rent</label><input id="split-houseRent" type="number" min="0" max="100" step="0.01" inputmode="decimal">
+          <label for="split-medical" data-i18n="medical">Medical</label><input id="split-medical" type="number" min="0" max="100" step="0.01" inputmode="decimal">
+          <label for="split-conveyance" data-i18n="conveyance">Conveyance</label><input id="split-conveyance" type="number" min="0" max="100" step="0.01" inputmode="decimal">
+          <label for="split-others" data-i18n="others">Others</label><input id="split-others" type="number" min="0" max="100" step="0.01" inputmode="decimal">
+        </div>
+        <div class="split-row">
+          <span id="split-sum" class="split-sum"></span>
+          <button id="reset-split" class="btn ghost small" data-i18n="resetSplit">Reset split</button>
+        </div>
+
+        <label for="pf" data-i18n="pfLabel">Provident Fund (PF) %</label>
+        <input id="pf" type="number" min="0" max="50" step="0.01" inputmode="decimal">
+        <label for="pfBase" data-i18n="pfBaseLabel">PF calculated on</label>
+        <select id="pfBase">
+          <option value="basic" data-i18n="pfBaseBasic">Basic</option>
+          <option value="gross" data-i18n="pfBaseGross">Gross</option>
+        </select>
+
+        <label for="tax" data-i18n="taxLabel">Monthly income tax (BDT)</label>
+        <input id="tax" type="number" min="0" step="0.01" inputmode="decimal">
+        <label for="other" data-i18n="otherLabel">Other deductions (BDT)</label>
+        <input id="other" type="number" min="0" step="0.01" inputmode="decimal">
+
+        <button id="compute-btn" class="btn primary wide" data-i18n="compute">Calculate</button>
+        <p id="calc-msg" class="msg" role="alert"></p>
+      </div>
+
+      <div class="card" id="result" hidden>
+        <h2 data-i18n="resultTitle">Payslip</h2>
+        <table class="payslip"><tbody id="result-table"></tbody></table>
+        <div class="no-print" id="save-section" hidden>
+          <label for="month" data-i18n="saveLabel">Month for this payslip</label>
+          <input id="month" type="month">
+          <div class="btn-row">
+            <button id="save-btn" class="btn primary" data-i18n="saveBtn">Save payslip</button>
+            <button id="print-btn" class="btn outline" data-i18n="printBtn">Print payslip</button>
+          </div>
+          <p id="slip-msg" class="msg" role="alert"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-slips" class="tab-panel" hidden>
+    <div class="card">
+      <h2 data-i18n="savedTitle">Saved payslips</h2>
+      <div id="slip-list"></div>
+    </div>
+  </section>
+
+  <section id="panel-data" class="tab-panel" hidden>
+    <div class="card">
+      <h2 data-i18n="tabData">Data</h2>
+      <div class="btn-row">
+        <button id="export-btn" class="btn primary" data-i18n="exportBtn">Export JSON</button>
+        <label class="btn outline file-label" for="import-file" data-i18n="importLabel">Import JSON</label>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+      </div>
+      <label for="clear-confirm" data-i18n="clearLabel">Type DELETE to erase all saved payslips</label>
+      <input id="clear-confirm" type="text" autocomplete="off">
+      <button id="clear-btn" class="btn danger" data-i18n="clearBtn">Erase all</button>
+      <p id="data-msg" class="msg" role="alert"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="no-print">
+  <p data-i18n="footer">Personal planning tool. The default split is a common starting point, not a rule -- match it to your appointment letter. Tax here is the amount you enter (e.g. from your tax calculation), not computed by this app. No data leaves your browser.</p>
+</footer>
+
+<script src="js/logic.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
